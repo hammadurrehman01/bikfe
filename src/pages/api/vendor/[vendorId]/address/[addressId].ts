@@ -1,0 +1,25 @@
+import {
+  getVendorAddressById,
+  deleteVendorAddress,
+  updateVendorAddress,
+} from 'controller/vendor/address/vendorAddressController';
+import { MethodNotAllowed } from 'config/api/responses';
+import authMiddleware from 'middlewares/api/authMiddleware';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  switch (req.method) {
+    case 'GET':
+      return await getVendorAddressById(req, res);
+    case 'DELETE':
+      return await deleteVendorAddress(req, res);
+    case 'PUT':
+      return await updateVendorAddress(req, res);
+    default:
+      res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+      return res
+        .status(MethodNotAllowed)
+        .end(`Method ${req.method} Not Allowed`);
+  }
+}
+export default authMiddleware(handler);

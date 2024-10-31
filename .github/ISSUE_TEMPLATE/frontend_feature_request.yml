@@ -1,0 +1,51 @@
+name: Frontend Feature Request
+description: New frontend feature to be implemented
+title: ':computer: '
+labels: ['frontend']
+assignees: []
+projects: ['Techlabs-do/41']
+
+body:
+  - type: markdown
+    attributes:
+      value: 'Thank you for taking the time to suggest a new feature. Please fill out the following form as completely as possible.'
+
+  - type: textarea
+    id: what-is-the-feature
+    attributes:
+      label: What is the feature
+      description: Explain what is the feature.
+      placeholder: Describe the feature you'd like to see implemented.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What is the acceptance criteria?
+      placeholder: Specify the conditions that must be fulfilled for the feature to be accepted.
+    validations:
+      required: true
+
+  - type: input
+    id: link-to-services
+    attributes:
+      label: Link to services (e.g., Figma, Loom)
+      description: Provide a link that explains the feature, such as a Figma design, for video reference.
+      placeholder: Paste the link here.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: 'To add additional information or screenshots, please create the issue first. After that, you can edit the issue to attach images by dragging and dropping, selecting them, or pasting from the clipboard.'
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: Add any other information or screenshots about the feature request here.
+      placeholder: Any additional context or information.
+    validations:
+      required: false

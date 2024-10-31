@@ -1,0 +1,195 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RECEIPT_STATUS {
+  PENDING
+  SUCCESS
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deleted   Boolean  @default(false)
+}
+
+model Customer {
+  id              Int                @id @default(autoincrement())
+  companyName     String             @unique
+  website         String?
+  email           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now())
+  deleted         Boolean            @default(false)
+  customerAddress CustomerAddress[]
+  customerPhone   CustomerPhone[]
+  customerProduct CustomerProducts[]
+  customerInvoice Invoices[]
+}
+
+model CustomerAddress {
+  id         Int      @id @default(autoincrement())
+  address    String
+  country    String
+  customerId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  deleted    Boolean  @default(false)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model CustomerPhone {
+  id            Int      @id @default(autoincrement())
+  number        String   @unique
+  contactPerson String
+  customerId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  deleted       Boolean  @default(false)
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Vendors {
+  id            Int              @id @default(autoincrement())
+  companyName   String           @unique
+  website       String?
+  email         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @default(now())
+  deleted       Boolean          @default(false)
+  vendorBill    Bills[]
+  vendorAddress VendorAddress[]
+  vendorPhone   VendorPhone[]
+  vendorProduct VendorProducts[]
+}
+
+model VendorAddress {
+  id        Int      @id @default(autoincrement())
+  address   String
+  country   String
+  vendorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deleted   Boolean  @default(false)
+  vendor    Vendors  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model VendorPhone {
+  id            Int      @id @default(autoincrement())
+  number        String   @unique
+  contactPerson String
+  vendorId      Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  deleted       Boolean  @default(false)
+  vendor        Vendors  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model Products {
+  id              Int                @id @default(autoincrement())
+  name            String
+  oem             String?            @unique
+  image           String?
+  model            String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @default(now())
+  deleted         Boolean            @default(false)
+  customerProduct CustomerProducts[]
+  vendorProduct   VendorProducts[]
+}
+
+model CustomerProducts {
+  id          Int            @id @default(autoincrement())
+  customerId  Int
+  productId   Int
+  code        String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now())
+  deleted     Boolean        @default(false)
+  invoiceItem InvoiceItems[]
+  customer    Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product     Products       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, productId], name: "unique_customer_product")
+}
+
+model VendorProducts {
+  id        Int         @id @default(autoincrement())
+  vendorId  Int
+  productId Int
+  code      String
+  billItem  BillItems[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
+  deleted   Boolean     @default(false)
+  product   Products    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  vendor    Vendors     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, productId], name: "unique_vendor_product")
+}
+
+model Invoices {
+  id          Int            @id @default(autoincrement())
+  date        DateTime
+  currency    String
+  customerId  Int
+  status      RECEIPT_STATUS @default(PENDING)
+  invoiceItem InvoiceItems[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now())
+  deleted     Boolean        @default(false)
+  customer    Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model InvoiceItems {
+  id                Int              @id @default(autoincrement())
+  price             Float?
+  quantity          Int?
+  customerProductId Int
+  invoiceId         Int
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+  deleted           Boolean          @default(false)
+  customerProduct   CustomerProducts @relation(fields: [customerProductId], references: [id], onDelete: Cascade)
+  invoice           Invoices         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([customerProductId, invoiceId], name: "unique_invoice_item")
+}
+
+model Bills {
+  id        Int            @id @default(autoincrement())
+  date      DateTime
+  status    RECEIPT_STATUS @default(PENDING)
+  currency  String
+  vendorId  Int
+  billItem  BillItems[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now())
+  deleted   Boolean        @default(false)
+  vendor    Vendors        @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+model BillItems {
+  id              Int            @id @default(autoincrement())
+  price           Decimal?
+  quantity        Int?
+  vendorProductId Int
+  billId          Int
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now())
+  deleted         Boolean        @default(false)
+  bill            Bills          @relation(fields: [billId], references: [id], onDelete: Cascade)
+  vendorProduct   VendorProducts @relation(fields: [vendorProductId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorProductId, billId], name: "unique_bill_item")
+}

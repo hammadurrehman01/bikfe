@@ -1,0 +1,21 @@
+# .next
+# next-env.d.ts
+# node_modules
+# yarn.lock
+# package-lock.json
+# public
+# amplify
+# .graphqlconfig.yml
+# .prettierrc
+# .vscode
+
+
+
+
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.next
+.git
